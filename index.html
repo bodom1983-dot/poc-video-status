@@ -63,6 +63,13 @@
   .thumb img{width:100%; height:100%; object-fit:cover; display:block; transition:transform .25s;}
   .thumb:hover img{transform:scale(1.03);}
   .thumb.noimg img{display:none;}
+  .badge{position:absolute; left:8px; top:8px; background:rgba(0,0,0,.72); color:#fff; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px; z-index:1;}
+  .pnote{display:none; padding:10px 14px; font-size:12.5px; background:#2A2410; color:#F3D98B; border-bottom:1px solid #3a3218;}
+  #dPlay.pending .pnote{display:block;}
+  .tload{margin-top:12px; font-size:12.5px; color:var(--muted);}
+  .tload .pbar{height:6px; border-radius:99px; background:var(--surface-2); overflow:hidden; margin-top:6px;}
+  .tload .pbar i{display:block; height:100%; width:0; background:var(--accent); transition:width .2s;}
+  .or{font-size:12px; color:var(--faint); text-align:center; margin:12px 0 8px;}
   .thumb.noimg::after{content:"미리보기 준비 중"; position:absolute; inset:0; display:grid; place-items:center; font-size:12px; color:#8A94A3;}
   .card figcaption{padding:9px 11px 10px; font-size:12.5px; font-weight:600; line-height:1.35; word-break:break-all; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
   .tools{display:none; gap:6px; padding:0 10px 10px; flex-wrap:wrap;}
@@ -116,6 +123,7 @@
   .toast{position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(20px); opacity:0; background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:10px; font-size:13px; font-weight:600; transition:.25s; z-index:100; pointer-events:none; max-width:calc(100vw - 32px);}
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
   #dThumb{width:min(620px,calc(100vw - 32px));}
+  #dThumb .db{max-height:calc(100vh - 170px); overflow:auto;}
   #dThumb video,#dThumb .tprev{width:100%; aspect-ratio:16/9; background:#000; border-radius:8px; object-fit:contain; display:block;}
   .hidden{display:none !important;}
 </style>
@@ -125,6 +133,7 @@
   <div class="brand"><span class="eyebrow">Samsung Life · PoC</span><h1>삼성 POC 영상 제작 현황</h1></div>
   <div class="admin-tools" id="adminTools" hidden>
     <button class="btn primary" id="btnUpload">영상 업로드</button>
+    <button class="btn" id="btnPw">암호 변경</button>
     <button class="btn" id="btnLogout">관리 종료</button>
   </div>
   <div class="total"><b id="total">0</b><span>편</span></div>
@@ -138,6 +147,7 @@
 <main class="wrap" id="main"></main>
 
 <dialog id="dPlay"><div class="dh"><b id="playTitle"></b><button class="x" data-close aria-label="닫기">×</button></div>
+  <div class="pnote">방금 올라온 영상이라 구글 드라이브가 재생용으로 변환하는 중입니다. 변환이 끝나면 이 창에서 바로 재생됩니다.</div>
   <div class="frame"><iframe id="playFrame" allow="autoplay; fullscreen"></iframe></div></dialog>
 
 <dialog id="dLogin" style="width:min(380px,calc(100vw - 32px))"><form method="dialog" id="fLogin">
@@ -162,13 +172,15 @@
 <dialog id="dThumb">
   <div class="dh"><b id="thumbTitle">썸네일 변경</b><button class="x" data-close aria-label="닫기">×</button></div>
   <div class="db">
-    <label class="drop" id="tdrop"><input type="file" id="tIn" accept="video/*,image/*" hidden><b>원본 영상(또는 이미지) 파일 선택</b><br>영상이면 원하는 장면을 골라 지정합니다.</label>
+    <div class="tload" id="tLoad"><span id="tLoadMsg">드라이브에서 원본 영상을 불러오는 중…</span><div class="pbar"><i id="tLoadBar"></i></div></div>
     <div id="tvid" class="hidden" style="margin-top:12px">
       <video id="tVideo" muted playsinline preload="auto"></video>
       <input type="range" class="scrub" id="tScrub" min="0" max="1000" value="0">
       <div class="urow"><span class="tc" id="tTc">0:00</span><button class="btn sm" id="tCap">이 장면을 썸네일로</button></div>
     </div>
     <div class="uthumb" style="margin-top:12px"><img id="tPrev" alt=""><span id="tMsg">아직 지정 안 됨</span></div>
+    <div class="or">또는</div>
+    <label class="drop" id="tdrop" style="padding:12px"><input type="file" id="tIn" accept="video/*,image/*" hidden><b>내 PC의 영상·이미지 파일로 지정</b></label>
   </div>
   <div class="df"><button class="btn" data-close>취소</button><button class="btn primary" id="tSave" disabled>저장</button></div>
 </dialog>
@@ -184,6 +196,13 @@
   <div class="db" id="delMsg" style="font-size:13.5px"></div>
   <div class="df"><button class="btn" data-close>취소</button><button class="btn danger" id="delOk">삭제</button></div>
 </dialog>
+
+<dialog id="dPw" style="width:min(400px,calc(100vw - 32px))"><form method="dialog" id="fPw">
+  <div class="dh"><b>관리자 암호 변경</b><button type="button" class="x" data-close aria-label="닫기">×</button></div>
+  <div class="db"><div class="field"><label for="pw1">새 암호 (6자 이상)</label><input type="password" id="pw1" autocomplete="new-password"></div>
+  <div class="field"><label for="pw2">새 암호 확인</label><input type="password" id="pw2" autocomplete="new-password"></div><div class="err" id="pwErr"></div></div>
+  <div class="df"><button type="button" class="btn" data-close>취소</button><button class="btn primary" id="btnPwSave" value="ok">변경</button></div>
+</form></dialog>
 
 <div class="toast" id="toast"></div>
 
@@ -243,7 +262,7 @@ function render(){
     groups.forEach(g=>{
       body+=`<div class="substyle"><span class="sname">${esc(g.style)}</span><span class="bar"></span><span class="scount">${g.files.length}편</span></div><div class="grid">`;
       g.files.forEach(f=>{
-        body+=`<figure class="card" data-id="${esc(f.id)}"><button class="thumb" data-play="${esc(f.id)}" aria-label="${esc(f.title)} 재생"><img loading="lazy" src="${esc(thumbUrl(f))}" alt="" onerror="this.parentNode.classList.add('noimg')"></button>`+
+        body+=`<figure class="card" data-id="${esc(f.id)}"><button class="thumb" data-play="${esc(f.id)}" aria-label="${esc(f.title)} 재생">${f.ready===false?'<span class="badge">드라이브 변환 중</span>':''}<img loading="lazy" src="${esc(thumbUrl(f))}" alt="" onerror="this.parentNode.classList.add('noimg')"></button>`+
           `<figcaption title="${esc(f.title)}">${esc(f.title)}</figcaption>`+
           `<div class="tools"><button data-act="thumb">썸네일</button><button data-act="move">이동</button><button data-act="del" class="del">삭제</button></div></figure>`;
       });
@@ -272,7 +291,7 @@ async function load(){
 /* ===== 재생 ===== */
 document.addEventListener("click",e=>{
   const p=e.target.closest("[data-play]");
-  if(p){ const r=findFile(p.dataset.play); $("playTitle").textContent=r?r.file.title:""; $("playFrame").src="https://drive.google.com/file/d/"+encodeURIComponent(p.dataset.play)+"/preview"; $("dPlay").showModal(); return; }
+  if(p){ const r=findFile(p.dataset.play); $("playTitle").textContent=r?r.file.title:""; $("dPlay").classList.toggle("pending",!!(r&&r.file.ready===false)); $("playFrame").src="https://drive.google.com/file/d/"+encodeURIComponent(p.dataset.play)+"/preview"; $("dPlay").showModal(); return; }
   const t=e.target.closest(".tools button");
   if(t){ const id=t.closest(".card").dataset.id; const act=t.dataset.act; if(act==="thumb") openThumb(id); else if(act==="move") openMove(id); else openDel(id); }
 });
@@ -382,17 +401,35 @@ $("btnStart").onclick=async()=>{
 };
 
 /* ===== 썸네일 변경 ===== */
-let tTarget=null, tData=null;
-function openThumb(id){
-  const r=findFile(id); if(!r) return; tTarget=id; tData=null;
-  $("thumbTitle").textContent="썸네일 변경 · "+r.file.title; $("tvid").classList.add("hidden"); $("tPrev").removeAttribute("src"); $("tMsg").textContent="아직 지정 안 됨"; $("tSave").disabled=true;
-  $("dThumb").showModal();
+let tTarget=null, tData=null, tJob=0;
+const CHUNK=8*1024*1024;
+function setVideoSrc(url){ const v=$("tVideo"); if(v.src&&v.src.startsWith("blob:")) URL.revokeObjectURL(v.src); v.src=url; $("tScrub").value=0; $("tvid").classList.remove("hidden"); }
+async function loadFromDrive(id, job){
+  const bar=$("tLoadBar"), msg=$("tLoadMsg"); $("tLoad").classList.remove("hidden"); bar.style.width="0%"; msg.textContent="드라이브에서 원본 영상을 불러오는 중…";
+  try{
+    const m=await api({action:"meta", fileId:id}); if(job!==tJob) return;
+    const n=Math.ceil(m.size/CHUNK); const parts=new Array(n); let done=0, next=0;
+    async function worker(){ while(next<n){ const i=next++; const s=i*CHUNK, e=Math.min(m.size,s+CHUNK)-1;
+      const j=await api({action:"chunk", fileId:id, start:s, end:e}); if(job!==tJob) throw new Error("cancel");
+      parts[i]=await (await fetch("data:application/octet-stream;base64,"+j.b64)).arrayBuffer();
+      done++; bar.style.width=(done/n*100).toFixed(0)+"%"; msg.textContent=`드라이브에서 원본 영상을 불러오는 중… ${Math.round(done/n*100)}% (${(m.size/1048576).toFixed(1)}MB)`; } }
+    await Promise.all([worker(),worker(),worker()].slice(0,Math.max(1,Math.min(3,n))));
+    if(job!==tJob) return;
+    setVideoSrc(URL.createObjectURL(new Blob(parts,{type:m.mime||"video/mp4"})));
+    $("tLoad").classList.add("hidden");
+  }catch(err){ if(job!==tJob||err.message==="cancel") return; msg.textContent="원본을 불러오지 못했습니다 ("+err.message+"). 아래에서 PC 파일로 지정할 수 있습니다."; }
 }
+function openThumb(id){
+  const r=findFile(id); if(!r) return; tTarget=id; tData=null; const job=++tJob;
+  $("thumbTitle").textContent="썸네일 변경 · "+r.file.title; $("tvid").classList.add("hidden"); $("tPrev").removeAttribute("src"); $("tMsg").textContent="아직 지정 안 됨"; $("tSave").disabled=true;
+  $("dThumb").showModal(); loadFromDrive(id, job);
+}
+$("dThumb").addEventListener("close",()=>{ tJob++; const v=$("tVideo"); v.pause(); if(v.src&&v.src.startsWith("blob:")){ URL.revokeObjectURL(v.src); } v.removeAttribute("src"); v.load(); });
 bindScrub($("tVideo"),$("tScrub"),$("tTc"));
 $("tIn").onchange=async e=>{
-  const f=e.target.files[0]; e.target.value=""; if(!f) return;
+  const f=e.target.files[0]; e.target.value=""; if(!f) return; tJob++; $("tLoad").classList.add("hidden");
   if(/^image\//.test(f.type)){ $("tvid").classList.add("hidden"); tData=await imageToJpeg(f); $("tPrev").src=tData; $("tMsg").innerHTML='<span class="ok">이미지로 지정됨</span>'; $("tSave").disabled=false; }
-  else { const v=$("tVideo"); if(v.src) URL.revokeObjectURL(v.src); v.src=URL.createObjectURL(f); $("tScrub").value=0; $("tvid").classList.remove("hidden"); }
+  else setVideoSrc(URL.createObjectURL(f));
 };
 $("tCap").onclick=()=>{ const v=$("tVideo"); if(!v.videoWidth){ toast("영상을 불러오는 중입니다"); return; } tData=capture(v); $("tPrev").src=tData; $("tMsg").innerHTML=`<span class="ok">장면 지정됨</span> (${fmt(v.currentTime)})`; $("tSave").disabled=false; };
 $("tSave").onclick=async()=>{
@@ -430,6 +467,18 @@ $("delOk").onclick=async()=>{
   catch(err){ toast("삭제 실패: "+err.message); }
   finally{ $("delOk").disabled=false; }
 };
+
+/* ===== 암호 변경 ===== */
+$("btnPw").onclick=()=>{ $("pw1").value=""; $("pw2").value=""; $("pwErr").textContent=""; $("dPw").showModal(); $("pw1").focus(); };
+$("fPw").addEventListener("submit",async e=>{
+  e.preventDefault(); const a=$("pw1").value.trim(), b=$("pw2").value.trim();
+  if(a.length<6){ $("pwErr").textContent="6자 이상 입력하세요."; return; }
+  if(a!==b){ $("pwErr").textContent="두 입력이 다릅니다."; return; }
+  $("btnPwSave").disabled=true; $("pwErr").textContent="변경 중…";
+  try{ await api({action:"setkey", newKey:a}); adminKey=a; sstore.set("poc_admin",a); $("dPw").close(); toast("암호가 변경되었습니다"); }
+  catch(err){ $("pwErr").textContent=err.message==="unknown_action"?"백엔드가 아직 새 버전으로 배포되지 않았습니다.":"변경 실패: "+err.message; }
+  finally{ $("btnPwSave").disabled=false; }
+});
 
 /* ===== 시작 ===== */
 load().then(()=>{ if(adminKey&&API_URL) setAdmin(true); });
