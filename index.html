@@ -260,7 +260,7 @@ function render(){
     tiles+=`<a class="stile" href="#sec-${c.key}" style="--sc:${c.c}"><div class="sname">${esc(c.label)}</div><div class="snum">${n}<small>편</small></div></a>`;
     let body="";
     groups.forEach(g=>{
-      body+=`<div class="substyle"><span class="sname">${esc(g.style)}</span><span class="bar"></span><span class="scount">${g.files.length}편</span></div><div class="grid">`;
+      body+=`<div class="substyle"><span class="sname">${esc(g.style.replace(/^[\u2460-\u2473]\s*/,""))}</span><span class="bar"></span><span class="scount">${g.files.length}편</span></div><div class="grid">`;
       g.files.forEach(f=>{
         body+=`<figure class="card" data-id="${esc(f.id)}"><button class="thumb" data-play="${esc(f.id)}" aria-label="${esc(f.title)} 재생">${f.ready===false?'<span class="badge">드라이브 변환 중</span>':''}<img loading="lazy" src="${esc(thumbUrl(f))}" alt="" onerror="this.parentNode.classList.add('noimg')"></button>`+
           `<figcaption title="${esc(f.title)}">${esc(f.title)}</figcaption>`+
