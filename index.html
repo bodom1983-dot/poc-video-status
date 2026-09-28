@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>삼성 POC 영상 제작 현황</title>
+<style>
+  :root{
+    --bg:#F4F6F9; --surface:#fff; --surface-2:#EEF1F6; --ink:#18202E; --muted:#5C6675; --faint:#8A94A3; --border:#E2E7EE;
+    --shadow:0 1px 2px rgba(16,24,40,.06),0 10px 26px rgba(16,24,40,.06);
+    --c-product:#2559C7; --c-sales:#0E8C86; --c-tax:#B67A16; --c-health:#2E8B57; --danger:#C8372D; --accent:#2559C7;
+    --sans:"Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif; --mono:ui-monospace,"SF Mono",Consolas,monospace;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme:dark){ :root{
+    --bg:#0D141F; --surface:#151E2B; --surface-2:#1D2836; --ink:#E7ECF3; --muted:#9AA5B4; --faint:#6B7686; --border:#26313F;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.38);
+    --c-product:#5B8CF0; --c-sales:#33B3AC; --c-tax:#D69B3F; --c-health:#54B37E; --danger:#E5675D; --accent:#5B8CF0; color-scheme:dark; } }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.5; -webkit-font-smoothing:antialiased;}
+  button,input,select{font:inherit; color:inherit;}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 16px;}
+  header.top{position:sticky; top:0; z-index:20; background:color-mix(in srgb,var(--bg) 88%,transparent); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-bottom:1px solid var(--border);}
+  .top-in{display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 0;}
+  .brand{margin-right:auto; display:flex; flex-direction:column; gap:2px; min-width:0;}
+  .eyebrow{font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--faint);}
+  h1{font-size:20px; font-weight:900; margin:0; letter-spacing:-.01em;}
+  .total{display:flex; align-items:baseline; gap:7px; padding:8px 14px; border:1px solid var(--border); border-radius:11px; background:var(--surface);}
+  .total b{font-family:var(--mono); font-size:20px;} .total span{font-size:12px; color:var(--muted);}
+  .lock{width:36px; height:36px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--faint); display:grid; place-items:center; cursor:pointer;}
+  .lock:hover{color:var(--ink);} .lock svg{width:16px; height:16px;}
+  .admin-tools{display:flex; gap:8px; align-items:center;}
+  .admin-tools[hidden]{display:none;}
+  .btn{border:1px solid var(--border); background:var(--surface); border-radius:9px; padding:8px 14px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap;}
+  .btn:hover{border-color:color-mix(in srgb,var(--ink) 30%,var(--border));}
+  .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .btn.danger{background:var(--danger); border-color:var(--danger); color:#fff;}
+  .btn.sm{padding:5px 10px; font-size:12px;}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+  .summary{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; padding:16px 0 2px;}
+  .stile{background:var(--surface); border:1px solid var(--border); border-top:3px solid var(--sc); border-radius:12px; padding:12px 14px; display:flex; flex-direction:column; gap:5px; box-shadow:var(--shadow); text-decoration:none; color:inherit;}
+  .stile .sname{font-size:12.5px; font-weight:700; color:var(--muted);} .stile .sname small{font-weight:600; color:var(--sc); margin-left:4px; font-size:11px;}
+  .stile .snum{font-family:var(--mono); font-size:27px; font-weight:600; color:var(--sc); line-height:1;}
+  .stile .snum small{font-size:12.5px; color:var(--muted); margin-left:2px;}
+  @media (max-width:560px){ .summary{grid-template-columns:repeat(2,1fr);} h1{font-size:18px;} }
+  .lede{color:var(--muted); font-size:13px; padding:12px 0 4px; margin:0;}
+  .lede .warn{color:var(--danger);}
+  main{padding:8px 0 44px; display:flex; flex-direction:column; gap:30px;}
+  section.cat{scroll-margin-top:78px;}
+  .cat-head{display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding-bottom:12px; border-bottom:1px solid var(--border); margin-bottom:6px;}
+  .dot{width:12px; height:12px; border-radius:50%; background:var(--cat); box-shadow:0 0 0 4px color-mix(in srgb,var(--cat) 18%,transparent);}
+  .cat-name{font-size:16px; font-weight:800;} .cat-sub{font-size:12px; color:var(--faint);}
+  .cat-note{font-size:11.5px; font-weight:600; color:var(--cat); white-space:nowrap;}
+  .count{margin-left:auto; font-family:var(--mono); font-weight:600; font-size:13px; color:var(--cat); background:color-mix(in srgb,var(--cat) 12%,var(--surface)); border:1px solid color-mix(in srgb,var(--cat) 30%,transparent); padding:4px 11px; border-radius:999px;}
+  .substyle{display:flex; align-items:center; gap:11px; padding:14px 2px 6px;}
+  .substyle .sname{font-size:13.5px; font-weight:700;} .substyle .bar{flex:1; height:1px; background:var(--border);}
+  .substyle .scount{font-family:var(--mono); font-size:12px; color:var(--cat); background:color-mix(in srgb,var(--cat) 12%,var(--surface)); border:1px solid color-mix(in srgb,var(--cat) 28%,transparent); padding:2px 10px; border-radius:999px;}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; margin:6px 0 4px;}
+  @media (max-width:560px){ .grid{grid-template-columns:repeat(2,1fr); gap:10px;} }
+  .card{margin:0; background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow:var(--shadow); display:flex; flex-direction:column; min-width:0;}
+  .thumb{position:relative; display:block; width:100%; aspect-ratio:16/9; border:0; padding:0; background:#0B1119; cursor:pointer; overflow:hidden;}
+  .thumb img{width:100%; height:100%; object-fit:cover; display:block; transition:transform .25s;}
+  .thumb:hover img{transform:scale(1.03);}
+  .thumb.noimg img{display:none;}
+  .thumb.noimg::after{content:"미리보기 준비 중"; position:absolute; inset:0; display:grid; place-items:center; font-size:12px; color:#8A94A3;}
+  .card figcaption{padding:9px 11px 10px; font-size:12.5px; font-weight:600; line-height:1.35; word-break:break-all; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+  .tools{display:none; gap:6px; padding:0 10px 10px; flex-wrap:wrap;}
+  body.admin .tools{display:flex;}
+  .tools button{flex:1; border:1px solid var(--border); background:var(--surface-2); border-radius:7px; padding:4px 6px; font-size:11.5px; font-weight:700; cursor:pointer;}
+  .tools button.del{color:var(--danger);}
+  .empty{color:var(--faint); font-size:13px; padding:10px 2px;}
+
+  dialog{border:1px solid var(--border); border-radius:14px; background:var(--surface); color:var(--ink); padding:0; box-shadow:0 24px 70px rgba(0,0,0,.35); max-width:calc(100vw - 32px);}
+  dialog::backdrop{background:rgba(8,12,20,.62);}
+  .dh{display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--border);}
+  .dh b{font-size:14.5px; margin-right:auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .x{width:30px; height:30px; border-radius:8px; border:1px solid var(--border); background:var(--surface); cursor:pointer; font-size:16px; line-height:1; flex:none;}
+  .db{padding:14px;} .df{display:flex; justify-content:flex-end; gap:8px; padding:12px 14px; border-top:1px solid var(--border); align-items:center;}
+  .df .note{margin-right:auto; font-size:12px; color:var(--muted);}
+  #dPlay{width:min(960px,calc(100vw - 32px)); background:#000; border-color:#222;}
+  #dPlay .dh{background:var(--surface);}
+  .frame{position:relative; width:100%; aspect-ratio:16/9; background:#000;}
+  .frame iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+  .field{display:flex; flex-direction:column; gap:6px; margin-bottom:12px;}
+  .field label{font-size:12px; font-weight:700; color:var(--muted);}
+  input[type=password],select{border:1px solid var(--border); background:var(--surface-2); border-radius:9px; padding:9px 11px; font-size:14px; width:100%;}
+  select.missing{border-color:var(--danger); box-shadow:0 0 0 3px color-mix(in srgb,var(--danger) 20%,transparent);}
+  .err{color:var(--danger); font-size:12.5px; min-height:1em;}
+
+  #dUp{width:min(1000px,calc(100vw - 32px));}
+  #dUp .db{max-height:calc(100vh - 220px); overflow:auto;}
+  .drop{display:block; border:2px dashed var(--border); border-radius:12px; padding:22px; text-align:center; color:var(--muted); font-size:13.5px; cursor:pointer; background:var(--surface-2);}
+  .drop.over{border-color:var(--accent); color:var(--accent);}
+  .drop b{color:var(--ink);}
+  .bulk{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:12px 0 4px; font-size:12.5px; color:var(--muted);}
+  .bulk select{width:auto; padding:6px 9px; font-size:13px;}
+  .uitem{display:grid; grid-template-columns:minmax(0,300px) minmax(0,1fr) auto; gap:14px; padding:14px 0; border-bottom:1px solid var(--border);}
+  .uitem.focus{background:color-mix(in srgb,var(--accent) 6%,transparent); border-radius:10px;}
+  @media (max-width:700px){ .uitem{grid-template-columns:1fr auto;} .uitem .uvid{grid-column:1 / -1;} }
+  .uvid video{width:100%; aspect-ratio:16/9; background:#000; border-radius:8px; display:block; object-fit:contain;}
+  .scrub{width:100%; margin:8px 0 4px;}
+  .urow{display:flex; align-items:center; gap:8px;} .tc{font-family:var(--mono); font-size:12px; color:var(--muted); margin-right:auto;}
+  .umeta{display:flex; flex-direction:column; gap:8px; min-width:0;}
+  .uname{font-size:13px; font-weight:700; word-break:break-all;}
+  .usel{display:grid; grid-template-columns:1fr 1.4fr; gap:8px;}
+  .usel select{padding:7px 9px; font-size:13px;}
+  .uthumb{display:flex; align-items:center; gap:10px; font-size:12px; color:var(--muted);}
+  .uthumb img{width:112px; aspect-ratio:16/9; object-fit:cover; border-radius:6px; background:var(--surface-2); border:1px solid var(--border);}
+  .uthumb img:not([src]){visibility:hidden;}
+  .uthumb .ok{color:var(--c-health); font-weight:700;}
+  .uprog{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted);}
+  .uprog .pbar{flex:1; height:6px; border-radius:99px; background:var(--surface-2); overflow:hidden;}
+  .uprog .pbar i{display:block; height:100%; width:0; background:var(--accent); transition:width .2s;}
+  .uitem.done .pbar i{background:var(--c-health);} .uitem.fail .ust{color:var(--danger);}
+  .toast{position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(20px); opacity:0; background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:10px; font-size:13px; font-weight:600; transition:.25s; z-index:100; pointer-events:none; max-width:calc(100vw - 32px);}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  #dThumb{width:min(620px,calc(100vw - 32px));}
+  #dThumb video,#dThumb .tprev{width:100%; aspect-ratio:16/9; background:#000; border-radius:8px; object-fit:contain; display:block;}
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap top-in">
+  <div class="brand"><span class="eyebrow">Samsung Life · PoC</span><h1>삼성 POC 영상 제작 현황</h1></div>
+  <div class="admin-tools" id="adminTools" hidden>
+    <button class="btn primary" id="btnUpload">영상 업로드</button>
+    <button class="btn" id="btnLogout">관리 종료</button>
+  </div>
+  <div class="total"><b id="total">0</b><span>편</span></div>
+  <button class="lock hidden" id="btnAdmin" title="관리자" aria-label="관리자 로그인"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></button>
+</div></header>
+
+<div class="wrap">
+  <div class="summary" id="summary"></div>
+  <p class="lede" id="lede">썸네일을 누르면 영상이 재생됩니다.</p>
+</div>
+<main class="wrap" id="main"></main>
+
+<dialog id="dPlay"><div class="dh"><b id="playTitle"></b><button class="x" data-close aria-label="닫기">×</button></div>
+  <div class="frame"><iframe id="playFrame" allow="autoplay; fullscreen"></iframe></div></dialog>
+
+<dialog id="dLogin" style="width:min(380px,calc(100vw - 32px))"><form method="dialog" id="fLogin">
+  <div class="dh"><b>관리자</b><button type="button" class="x" data-close aria-label="닫기">×</button></div>
+  <div class="db"><div class="field"><label for="pw">관리자 암호</label><input type="password" id="pw" autocomplete="current-password"></div><div class="err" id="loginErr"></div></div>
+  <div class="df"><button type="button" class="btn" data-close>취소</button><button class="btn primary" id="btnLogin" value="ok">확인</button></div>
+</form></dialog>
+
+<dialog id="dUp">
+  <div class="dh"><b>영상 업로드</b><button class="x" data-close aria-label="닫기">×</button></div>
+  <div class="db">
+    <label class="drop" id="drop"><input type="file" id="fileIn" accept="video/*" multiple hidden>
+      <b>영상 파일을 끌어다 놓거나 클릭해서 선택</b><br>여러 개를 한 번에 올릴 수 있습니다. 각 영상마다 카테고리와 썸네일 장면을 지정하세요.</label>
+    <div class="bulk" id="bulk" hidden>일괄 지정:
+      <select id="bulkCat"></select><select id="bulkStyle"></select><button class="btn sm" id="bulkApply">카테고리 미지정 항목에 적용</button>
+    </div>
+    <div id="ulist"></div>
+  </div>
+  <div class="df"><span class="note" id="upNote"></span><button class="btn" data-close>닫기</button><button class="btn primary" id="btnStart" disabled>업로드 시작</button></div>
+</dialog>
+
+<dialog id="dThumb">
+  <div class="dh"><b id="thumbTitle">썸네일 변경</b><button class="x" data-close aria-label="닫기">×</button></div>
+  <div class="db">
+    <label class="drop" id="tdrop"><input type="file" id="tIn" accept="video/*,image/*" hidden><b>원본 영상(또는 이미지) 파일 선택</b><br>영상이면 원하는 장면을 골라 지정합니다.</label>
+    <div id="tvid" class="hidden" style="margin-top:12px">
+      <video id="tVideo" muted playsinline preload="auto"></video>
+      <input type="range" class="scrub" id="tScrub" min="0" max="1000" value="0">
+      <div class="urow"><span class="tc" id="tTc">0:00</span><button class="btn sm" id="tCap">이 장면을 썸네일로</button></div>
+    </div>
+    <div class="uthumb" style="margin-top:12px"><img id="tPrev" alt=""><span id="tMsg">아직 지정 안 됨</span></div>
+  </div>
+  <div class="df"><button class="btn" data-close>취소</button><button class="btn primary" id="tSave" disabled>저장</button></div>
+</dialog>
+
+<dialog id="dMove" style="width:min(440px,calc(100vw - 32px))">
+  <div class="dh"><b id="moveTitle">카테고리 이동</b><button class="x" data-close aria-label="닫기">×</button></div>
+  <div class="db"><div class="field"><label>카테고리</label><select id="mCat"></select></div><div class="field"><label>세부 유형</label><select id="mStyle"></select></div></div>
+  <div class="df"><button class="btn" data-close>취소</button><button class="btn primary" id="mSave">이동</button></div>
+</dialog>
+
+<dialog id="dDel" style="width:min(420px,calc(100vw - 32px))">
+  <div class="dh"><b>영상 삭제</b><button class="x" data-close aria-label="닫기">×</button></div>
+  <div class="db" id="delMsg" style="font-size:13.5px"></div>
+  <div class="df"><button class="btn" data-close>취소</button><button class="btn danger" id="delOk">삭제</button></div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script>
+/* ===== 설정 ===== */
+const API_URL = window.POC_API_URL || ""; // Apps Script 웹앱 주소는 config.js에서 지정 (없으면 고정 목록으로 표시)
+
+const CATS=[
+  {key:"product", prefix:"상품안내", label:"① 상품 안내", sub:"건강보험·암·치매·종신 등", note:"(+기타 카테고리 포함)", c:"var(--c-product)"},
+  {key:"sales",   prefix:"영업화법", label:"② 영업화법", sub:"화법·리크루팅 화법", c:"var(--c-sales)"},
+  {key:"tax",     prefix:"세금",     label:"③ 세금",     sub:"택슈어런스", c:"var(--c-tax)"},
+  {key:"health",  prefix:"건강정보", label:"④ 건강정보", sub:"질환 정보·치료 트렌드", c:"var(--c-health)"},
+];
+const STYLES=["① 와카스튜디오 제공 컨셉 활용형","② 캐릭터 로테이션 시리즈","③ 보험 에피소드형","④ 비추미 마스코트 활용형","⑤ 영업화법 기본형(롤플레잉)","⑥ 신규 템플릿(퀴즈쇼 등)","⑦ 일반 이미지썰","⑧ 썰+생성형 결합형","기타"];
+const CAT_STYLES={
+  product:[0,1,2,3,5,6,7,8], sales:[1,4,8], tax:[0,1,2,5,6,7,8], health:[0,2,3,5,6,7,8],
+};
+const FALLBACK = [{"name":"상품안내_① 와카스튜디오 제공 컨셉 활용형","files":[{"id":"1rSdmGXQYYKKnKIfu6wj_Qk69HM6-ArKd","title":"암치플_01","thumb":null},{"id":"1517v2jsc1quoSnDboNrwIAEzVJMvuPfB","title":"암치플_02","thumb":null},{"id":"1PAP0BLc_LMyPlWEKEjw-otRC4BGl3cw3","title":"암치플_04","thumb":null},{"id":"1rA1w0dEdredOxGnzJQWpfNBNXGh4Y5zY","title":"암치플03","thumb":null},{"id":"1iQHz-bxpKaOFjjvOSunj-NsUhFVB3PSg","title":"암패스_03","thumb":null},{"id":"1QfWhqsfPewrLu79zyc1xOj588mLHR9GI","title":"암패스_04","thumb":null},{"id":"15y0dePNfzkJqetZ5XYKdnsahUOaiiwcJ","title":"암패스_05","thumb":null},{"id":"1msep1QUmz1Y8tbttyP75VJhbdf7dqfUd","title":"암패스01_","thumb":null},{"id":"18_sC_cu02dd3qI94nLXJtE_JYAiwZOGs","title":"암패스02","thumb":null}]},{"name":"상품안내_③ 보험 에피소드형","files":[{"id":"1gnJuFFm0hZC-T5xEBKLyiQ8ZhWQo-rJL","title":"삼성 암치플 3편 건강케어_2026-09-23","thumb":null},{"id":"1DAnkSMKSu5Ckz89V_v5ciO-gP_NWR4fP","title":"삼성 암치플 4편 체증형사망보험금","thumb":null},{"id":"11kqJLm-BA5-V4VXyCtZiOxYnt2j55-rR","title":"에피소드형01_암치플_V2","thumb":null},{"id":"1SiiPWfeELJsUi1kU_XULZqFQFadJKqE-","title":"에피소드형01_암치플","thumb":null},{"id":"1X6_hPKjhNCB9Ydna-mrYAOFGlEPpOr4X","title":"에피소드형02_암치플_단계별치료","thumb":null},{"id":"1iT9-8diSSQHSspf37couGA3j0U8a2BQd","title":"에피소드형03_암치플_건강케어","thumb":null},{"id":"1dj6Whk0wupYK03Uxd0d5JyxML_UXfIA-","title":"에피소드형04_암치플_체증형사망보험금","thumb":null}]},{"name":"상품안내_⑥ 신규 템플릿(퀴즈쇼 등)","files":[{"id":"1oHF8fAP5wh2g-z4MLeag-IZjuEJu_qF5","title":"암패스CM_01","thumb":null},{"id":"1stsAY3NCass5K12-B_q8OFR7JeeCdnuP","title":"암패스CM_02","thumb":null},{"id":"1OMVJ5Ou3yhO75b-S7Oi7VBw4oW_YIR3-","title":"암패스CM_03","thumb":null},{"id":"1yab0tPOUJGWPUySDf22epdsOtshhl6Wi","title":"퀴즈쇼_가족대표건보","thumb":null},{"id":"1CwwgxwmRjPBOMy2lc_kLSbnGkmu5EWEJ","title":"퀴즈쇼_뉴플러스원건보01","thumb":null},{"id":"1R3_PRr0qb5OqadhU5VA8cjhWgMqbwIwc","title":"퀴즈쇼_뉴플러스원건보02","thumb":null},{"id":"1BWXRfnMrXi_9sAneWvQIosv3upwfYw-F","title":"퀴즈쇼_암치플01","thumb":null},{"id":"10RG3mHoGeNDaOJRied562TqW4Bud4MvU","title":"퀴즈쇼_암치플02","thumb":null}]},{"name":"상품안내_⑦ 일반 이미지썰","files":[{"id":"1AdTr6ntC0hXxJVCY-5twlM2ehm8Fru0U","title":"삼성 암치료플러스 - 1편 치료보험금_2026-09-18","thumb":null},{"id":"1ULfsKLt3RXxcbaFRDE0JnipSAUWg5eDz","title":"삼성 암치료플러스 - 2편 사망보험금 체증_2026-09-18","thumb":null},{"id":"1dB4clzjf9HhLbZCp66HgJDPwsNmPvF4n","title":"삼성 암치료플러스 - 3편 저해약환급금형의 진실_2026-09-18 (1)","thumb":null},{"id":"1GkTQKdSb9PfKBkbM1EVEGVftg-1UMGVc","title":"암 PASS 플랜 - 1편 이 고객도 됩니다_2026-09-18","thumb":null},{"id":"1cH3LF8BSiWh1vf59kGoMyF5EOkV71yDL","title":"암 PASS 플랜 - 2편 설계창이 막힌 게 아니야_2026-09-18","thumb":null}]},{"name":"상품안내_기타","files":[{"id":"1BaeQLN0yodoqLHh31GHfeHGeA5khLo84","title":"길거리 인터뷰","thumb":null},{"id":"16Vnf98aLZh-PoTBM9whtaXbfUa_VOtcv","title":"방송사고 스타일","thumb":null},{"id":"1036oOJiOHVE-oejyZyMrnLfohgvEYVqB","title":"보험보장설계-해설보강-27초","thumb":null},{"id":"1fMKgoS-2S5PIxa6fXpNDooRRLm7bsFQ6","title":"비만형당뇨","thumb":null},{"id":"15mxThe1NueQvWVg9b4hnjWNgwj4Waz79","title":"실손청구앱판-7컷","thumb":null},{"id":"1-mpg42JVxUXthlXVc9GXuUXGWmAYzjFx","title":"영화 패러디_신세계","thumb":null},{"id":"1MsSGLsDiFuvEaiN-gp2k6AnrkITFv7tB","title":"요원 미션 브리핑(개선)","thumb":null},{"id":"1bRhK0ODc50FhGDMflc1l4NTf0n--gGUQ","title":"유병자보험","thumb":null},{"id":"1x6smb3r0XnL2o1nnliW6pRQQoZI7BriB","title":"전화 통화 스타일","thumb":null}]},{"name":"영업화법_② 캐릭터 로테이션 시리즈","files":[{"id":"1QkadB4_KdRyejTFYEIQaTMeHxM499zpu","title":"월간화법_도슨트_고객 눈높이로 쉽게 설명하기","thumb":null},{"id":"1aTS1YMjxHDVR_VWRO-bWcBmVV3xcnUIl","title":"월간화법_벨보이_고객의 부담 덜기","thumb":null},{"id":"1WHWdxWQETJH3U2kgWIQsJGUydIRIez8w","title":"월간화법_소방관_고객의 화 진압","thumb":null},{"id":"1jAWYh2MsyYg55zuWzJsXlJWo48Ydh3r4","title":"월간화법_왕자_고객에게 예의 갖추기","thumb":null},{"id":"1dP43RilY6Aiym4plFO9YGuBUoZcIjD1v","title":"월간화법_카페사장_고객의 잔에 맞춰 채우기","thumb":null},{"id":"1UV7nzvmZ8Wac0eTv8V-dMtzEobKxXxZD","title":"월간화법_트레이너_고객의 기존 보장을 존중해 점검","thumb":null}]},{"name":"영업화법_⑤ 영업화법 기본형(롤플레잉)","files":[{"id":"17SDCPiWCTKvGm8VF--qYjlkkRssQ6Oem","title":"2화_변환","thumb":null},{"id":"1L5XZy3b5B4OntoYFAY3uOcRrpbOPwZQv","title":"3화_변환","thumb":null},{"id":"1h5bmnuzy8IxN0Z1YCULboJXP18qz29eg","title":"4화_변환","thumb":null},{"id":"1DxdsHm_zQ-YDbNDIpVlZDwjlw3n8lmPz","title":"5화_변환","thumb":null},{"id":"1cW09kSxRQr2xLGn4lQyhbfpZGzQvpF19","title":"6화_변환","thumb":null},{"id":"1CUPRYuzB2QlvsABJ4Xcsaau_O7rpZPUJ","title":"새출발 1화_첫전화","thumb":null},{"id":"1x9feDqgRWm4HKulWCv1f7pv3HKkuD1jo","title":"영업화법_선배의 위로","thumb":null},{"id":"1NtOFUkbklfyZmIzGv-7Gyh6BKzFIwkAN","title":"영업화법_스튜디오","thumb":null},{"id":"1_KrPNUkGMzgt9vJjLpzwYPXF5E6CS3AZ","title":"영업화법_애니메이션01","thumb":null},{"id":"187UeM0trbVJ1kx2VDHaZmDE1EPeJeeJp","title":"영업화법_애니메이션02","thumb":null},{"id":"1EwIWezGQ8n8BbZQprWBU_mgPoq_d8w7M","title":"영업화법_애니메이션03","thumb":null},{"id":"1qQxW1WnE-vWEanE12Y7dS3IXJmrHbKwS","title":"영업화법","thumb":null}]},{"name":"세금_① 와카스튜디오 제공 컨셉 활용형","files":[{"id":"1U9nWf5Q8db-sh72GQxWczRsWcUcX09rT","title":"택슈어런스_01","thumb":null},{"id":"16yzu3uEFFY8SDaiuwLs7IwcXY6Nlk1Tn","title":"택슈어런스_계약관계설계","thumb":null},{"id":"11SeAG5ggPYhKQkHQ1OM_sq8Gt3KOqEm0","title":"택슈어런스_상속과 증여의 차이","thumb":null},{"id":"1sdwKDwmaDREh0Inrlt1S60_REqIiOYw6","title":"택슈어런스_상속포기,한정승인","thumb":null}]},{"name":"세금_⑥ 신규 템플릿(퀴즈쇼 등)","files":[{"id":"1v8LdzhC2XE7P53GyLvpyVGmo3A4rOW8p","title":"상속세CM (2)","thumb":null},{"id":"1yXXDGpa4uTYaZzDehnASkm9dyqSAkiRR","title":"상속세CM","thumb":null}]},{"name":"세금_⑦ 일반 이미지썰","files":[{"id":"1BRojo-jQW-QOBq8_XNTTnPSRCx4WZasy","title":"상속세 썰 - 1편 금고에 넣으면 피할까_2026-09-18","thumb":null},{"id":"1_uLhviwq9U5gCmFB51ZNvc-cuO4eCVoU","title":"상속세 썰 - 2편 빚만 남기고 떠난 아버지_2026-09-18","thumb":null},{"id":"10lOyS5cmVBAAA7yaTuowdv-BX6P103wc","title":"상속세 썰 - 3편 배우자공제 30억의 함정_2026-09-18","thumb":null},{"id":"1L6gI7_bPkTO-pA7G1UOun_MJcaZA0c9g","title":"상속세 썰 - 4편 유류분의 반전_2026-09-18","thumb":null},{"id":"1nPSD9n0U-y-scSuoZytkhEwjiRvQ1PnK","title":"상속세 썰 - 5편 설명할 수 있느냐의 문제_2026-09-18","thumb":null},{"id":"1AZfuvfv8yBaRqDVkyKoWCAHdj6n7KJ3e","title":"증여세 썰02","thumb":null},{"id":"1mwkoVQl5GB6lZmEsFlhtackepU2DBrid","title":"증여세썰01","thumb":null}]},{"name":"세금_⑧ 썰+생성형 결합형","files":[{"id":"1S5sA2irbpYVNGf0bp69B27FTQtBKj25X","title":"하이브리드_세금_상속재산분할상식_사람","thumb":null},{"id":"1GXTY6ZZchJVIDNm7XnQdXHiOH033K6qm","title":"하이브리드_세금_상속재산분할상식1","thumb":null},{"id":"1jZrOh-Kt5fK5M6gJCHnDAQkMOjIIN3be","title":"하이브리드_세금_상속재산분할상식2_자막","thumb":null},{"id":"12VJ9sodEh0BDAwrMuptKK3fWOKTUvGwg","title":"하이브리드_세금_상속포기각서_사물","thumb":null},{"id":"1Emp6gSXR_oIXcfD2FGUuOeo2jJiXPru7","title":"하이브리드형_세금_상속과증여차이","thumb":null},{"id":"1DMGFKGUZgqvSCduhGGxgdFViPhpKDLRt","title":"하이브리드형_세금_증여세납부상식","thumb":null}]},{"name":"건강정보_① 와카스튜디오 제공 컨셉 활용형","files":[{"id":"15kQCa8S80Gr2E2y7N8H6X1fbRztHegFl","title":"건강상식-다섯편 통합","thumb":null},{"id":"1AVpIW5puAt85welRWyKAnB0UFuYLM0kE","title":"건강정보_야식끊기","thumb":null},{"id":"1TJXnZBDVOVwfYOhD_atKJLrCoh_-aD18","title":"건강정보(뮤비형)","thumb":null},{"id":"1LKCFg4u0HL8e7Ag8HBNyWbm_tFO3ezhs","title":"건강정보01_산책","thumb":null},{"id":"1ZOl3GRF0ld4LXbBOdcUF3U5HHIBSxPzX","title":"건강정보02_당뇨역사","thumb":null},{"id":"18-lf5CA05vSyAx5V929rvL_Tj_ETtMls","title":"건강정보03_물마시기","thumb":null},{"id":"14ekz518A9WzwNKbbqjK2k_ahAHJKacI6","title":"계단건강","thumb":null},{"id":"1zhQJ-jcdoHjErJsvU5cSsMh60aJzi-_j","title":"달리기 건강","thumb":null},{"id":"1n8qH86jRIH4eScOANfiSJMAyXwIg9s08","title":"일어나세요미남","thumb":null},{"id":"1FHLqi4Pi_SS5iDQv0wCjN0osmD6tLe23","title":"햇빛건강","thumb":null}]},{"name":"건강정보_③ 보험 에피소드형","files":[{"id":"1w4tIYQ79RBZ1cxHmHSQXRQYaCtRHuw12","title":"삼성 암패스 5편 지병자간편가입","thumb":null},{"id":"1j7vDBIyiKEdmOowBg5zLeDVxvf3lUnHV","title":"삼성 암패스 6편 완치지병가입_2026-09-23","thumb":null},{"id":"1XF8xRk9RrcGKn0BSHEYSYOiNKLWWcACE","title":"삼성 암패스 7편 약복용중가입_2026-09-23","thumb":null},{"id":"1o3VVNeRbj2nds-fGwZavvLId08C6jQYE","title":"삼성 암패스 7편 약복용중가입","thumb":null},{"id":"1tVib069mlRLfQU4gsTo3qpylljtpGUft","title":"삼성 암패스 8편 지병관리와암대비_2026-09-23 (1)","thumb":null},{"id":"1_u7d0aCbjppVEAiLVq2x44ZWoDAWzJPB","title":"삼성 암패스 8편 지병관리와암대비_2026-09-23","thumb":null},{"id":"1KYORV1zJp5DjFIGJjyFyh3kuF2D0kl5w","title":"에피소드형05_지병자간편가입","thumb":null},{"id":"1ZlJ9SeUrH1IsYDxx2ZS8ziQ4saUMuHr0","title":"에피소드형06_암패스_완치지병가입","thumb":null}]},{"name":"건강정보_⑦ 일반 이미지썰","files":[{"id":"17Ze7B9t83JxRI3FNh6skGaubHZLFjKBt","title":"썰영상_30대 심근경색","thumb":null},{"id":"1Z27Zd1tb1WCFnJbLP4QKtgjRzUqFZCva","title":"썰영상_갑상선암","thumb":null},{"id":"17gDlTaEw6gW_xd3B1HjGMX_YCIu26ksj","title":"썰영상_경도인지장애","thumb":null},{"id":"1sojrdjTrI7-9N2uHAtsCEaKjz8kstuKm","title":"썰영상_치매 100만 시대","thumb":null},{"id":"1j70YR76dFehlA3KNxBKLLsjNvzvjURIC","title":"썰영상_콩팥병","thumb":null}]},{"name":"건강정보_⑧ 썰+생성형 결합형","files":[{"id":"1xdL1aJUFuGyudQ31MMyod2Y3oDTU4_DT","title":"노인 고관절 골절","thumb":null},{"id":"1OxpxVqB1BgRKBqZ4xqs9Up-VsFYUQcXF","title":"면역항암제 급여 확대","thumb":null},{"id":"1bumbqq1nLvwA1Wk5UHIvK9liRTr2m7BR","title":"유병자보험 시장 급성장","thumb":null},{"id":"13W2X7wsvrRa9ru-WFCwDVNXeOeVLmVR-","title":"젊은 비만형 당뇨","thumb":null},{"id":"1jEsRMSRTEzbdc2SFwkWTmGbB8mrH6RIC","title":"젊은 여성 뇌혈관질환","thumb":null},{"id":"1ag8MXK7fDIR2SGMQnfnyCFeVUxB3xI9p","title":"하이브리드썰_30대심근경색","thumb":null},{"id":"1xNdkhhDV5U7EIY_w3HbyMeLUoCS7xO6R","title":"하이브리드썰_갑상선암","thumb":null},{"id":"1tpxCsHjvN3gBYvYonn8Ai6pJ6GlCt-8j","title":"하이브리드썰_경도인지장애","thumb":null},{"id":"1_q-RMeKxuuzlP0K-ICOPoALTS1pCnYyq","title":"하이브리드썰_치매100만 시대","thumb":null},{"id":"1RDHZCiI3tWNwTtrN4fI8CXp3wyCeiUUY","title":"하이브리드썰_콩팥병","thumb":null}]}];
+
+/* ===== 공통 ===== */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const sstore={get(k){try{return sessionStorage.getItem(k)}catch(e){return null}},set(k,v){try{sessionStorage.setItem(k,v)}catch(e){}},del(k){try{sessionStorage.removeItem(k)}catch(e){}}};
+let toastT; function toast(m){const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2600);}
+const fmt=s=>{s=Math.max(0,s||0); const m=Math.floor(s/60), r=Math.floor(s%60); return m+":"+String(r).padStart(2,"0");};
+const thumbUrl=f=>"https://drive.google.com/thumbnail?id="+encodeURIComponent(f.thumb||f.id)+"&sz=w640";
+const coll=new Intl.Collator("ko",{numeric:true});
+
+document.querySelectorAll("dialog").forEach(d=>{
+  d.addEventListener("click",e=>{ if(e.target===d || e.target.closest("[data-close]")) { e.preventDefault(); d.close(); } });
+});
+
+/* ===== 데이터 ===== */
+let folders=[];      // [{name, files:[{id,title,thumb}]}]
+let adminKey=sstore.get("poc_admin")||"";
+
+function parseFolder(name){
+  const i=name.indexOf("_"); if(i<0) return null;
+  const prefix=name.slice(0,i).trim(), style=name.slice(i+1).trim();
+  const cat=CATS.find(c=>c.prefix===prefix); if(!cat) return null;
+  return {cat, style};
+}
+function styleOrder(s){ const i=STYLES.indexOf(s); return i<0?99:i; }
+
+function render(){
+  const byCat={}; let total=0;
+  CATS.forEach(c=>byCat[c.key]=[]);
+  folders.forEach(f=>{ const p=parseFolder(f.name); if(!p||!f.files.length) return; byCat[p.cat.key].push({style:p.style, files:f.files.slice().sort((a,b)=>coll.compare(a.title,b.title))}); });
+  let tiles="", html="";
+  CATS.forEach(c=>{
+    const groups=byCat[c.key].sort((a,b)=>styleOrder(a.style)-styleOrder(b.style)||coll.compare(a.style,b.style));
+    const n=groups.reduce((a,g)=>a+g.files.length,0); total+=n;
+    tiles+=`<a class="stile" href="#sec-${c.key}" style="--sc:${c.c}"><div class="sname">${esc(c.label)}</div><div class="snum">${n}<small>편</small></div></a>`;
+    let body="";
+    groups.forEach(g=>{
+      body+=`<div class="substyle"><span class="sname">${esc(g.style)}</span><span class="bar"></span><span class="scount">${g.files.length}편</span></div><div class="grid">`;
+      g.files.forEach(f=>{
+        body+=`<figure class="card" data-id="${esc(f.id)}"><button class="thumb" data-play="${esc(f.id)}" aria-label="${esc(f.title)} 재생"><img loading="lazy" src="${esc(thumbUrl(f))}" alt="" onerror="this.parentNode.classList.add('noimg')"></button>`+
+          `<figcaption title="${esc(f.title)}">${esc(f.title)}</figcaption>`+
+          `<div class="tools"><button data-act="thumb">썸네일</button><button data-act="move">이동</button><button data-act="del" class="del">삭제</button></div></figure>`;
+      });
+      body+=`</div>`;
+    });
+    if(!groups.length) body=`<div class="empty">아직 등록된 영상이 없습니다.</div>`;
+    html+=`<section class="cat" id="sec-${c.key}" style="--cat:${c.c}"><div class="cat-head"><span class="dot"></span><span class="cat-name">${esc(c.label)}</span>${c.note?`<span class="cat-note">${esc(c.note)}</span>`:""}<span class="cat-sub">${esc(c.sub)}</span><span class="count">${n}편</span></div>${body}</section>`;
+  });
+  $("summary").innerHTML=tiles; $("main").innerHTML=html; $("total").textContent=total;
+}
+function findFile(id){ for(const f of folders){ const x=f.files.find(v=>v.id===id); if(x) return {folder:f, file:x}; } return null; }
+
+async function load(){
+  const cached=store.get("poc_list_v1");
+  if(cached){ try{ folders=JSON.parse(cached); }catch(e){ folders=FALLBACK; } } else folders=FALLBACK;
+  render();
+  if(!API_URL) return;
+  $("btnAdmin").classList.remove("hidden");
+  try{
+    const r=await fetch(API_URL,{cache:"no-store"}); const j=await r.json();
+    if(!j.ok) throw new Error(j.error);
+    folders=j.folders; store.set("poc_list_v1",JSON.stringify(folders)); render();
+  }catch(e){ console.warn("목록 갱신 실패",e); }
+}
+
+/* ===== 재생 ===== */
+document.addEventListener("click",e=>{
+  const p=e.target.closest("[data-play]");
+  if(p){ const r=findFile(p.dataset.play); $("playTitle").textContent=r?r.file.title:""; $("playFrame").src="https://drive.google.com/file/d/"+encodeURIComponent(p.dataset.play)+"/preview"; $("dPlay").showModal(); return; }
+  const t=e.target.closest(".tools button");
+  if(t){ const id=t.closest(".card").dataset.id; const act=t.dataset.act; if(act==="thumb") openThumb(id); else if(act==="move") openMove(id); else openDel(id); }
+});
+$("dPlay").addEventListener("close",()=>{ $("playFrame").src="about:blank"; });
+
+/* ===== 관리자 ===== */
+async function api(body){
+  const r=await fetch(API_URL,{method:"POST",body:JSON.stringify(Object.assign({key:adminKey},body))});
+  const j=await r.json(); if(!j.ok) throw new Error(j.error||"요청 실패"); return j;
+}
+function setAdmin(on){ document.body.classList.toggle("admin",on); $("adminTools").hidden=!on; $("btnAdmin").classList.toggle("hidden",on||!API_URL); }
+$("btnAdmin").onclick=()=>{ $("pw").value=""; $("loginErr").textContent=""; $("dLogin").showModal(); $("pw").focus(); };
+$("fLogin").addEventListener("submit",async e=>{
+  e.preventDefault(); const pw=$("pw").value.trim(); if(!pw) return;
+  $("btnLogin").disabled=true; $("loginErr").textContent="확인 중…";
+  const prev=adminKey; adminKey=pw;
+  try{ await api({action:"check"}); sstore.set("poc_admin",pw); setAdmin(true); $("dLogin").close(); toast("관리 모드"); }
+  catch(err){ adminKey=prev; $("loginErr").textContent=err.message==="unauthorized"?"암호가 맞지 않습니다.":"확인 실패: "+err.message; }
+  finally{ $("btnLogin").disabled=false; }
+});
+$("btnLogout").onclick=()=>{ adminKey=""; sstore.del("poc_admin"); setAdmin(false); };
+async function reload(){ try{ const r=await fetch(API_URL,{cache:"no-store"}); const j=await r.json(); if(j.ok){ folders=j.folders; store.set("poc_list_v1",JSON.stringify(folders)); render(); } }catch(e){} }
+
+function fillCat(sel,val,placeholder){ sel.innerHTML=(placeholder?`<option value="">${placeholder}</option>`:"")+CATS.map(c=>`<option value="${c.key}">${esc(c.label.replace(/^[①-④]\s*/,""))}</option>`).join(""); sel.value=val||""; }
+function fillStyle(sel,catKey,val,placeholder){ const idx=catKey?CAT_STYLES[catKey]:[]; let opts=idx.map(i=>STYLES[i]); if(val&&!opts.includes(val)) opts.push(val); sel.innerHTML=`<option value="">${placeholder||"세부 유형 선택"}</option>`+opts.map(s=>`<option>${esc(s)}</option>`).join(""); sel.value=val||""; sel.disabled=!catKey; }
+const folderName=(catKey,style)=>CATS.find(c=>c.key===catKey).prefix+"_"+style;
+
+/* 프레임 캡처 */
+function capture(video){
+  const w=Math.min(960,video.videoWidth||640), h=Math.round(w*(video.videoHeight||360)/(video.videoWidth||640));
+  const cv=document.createElement("canvas"); cv.width=w; cv.height=h; cv.getContext("2d").drawImage(video,0,0,w,h);
+  return cv.toDataURL("image/jpeg",0.85);
+}
+function imageToJpeg(file){ return new Promise((res,rej)=>{ const img=new Image(); img.onload=()=>{ const w=Math.min(960,img.naturalWidth), h=Math.round(w*img.naturalHeight/img.naturalWidth); const cv=document.createElement("canvas"); cv.width=w; cv.height=h; cv.getContext("2d").drawImage(img,0,0,w,h); URL.revokeObjectURL(img.src); res(cv.toDataURL("image/jpeg",0.85)); }; img.onerror=rej; img.src=URL.createObjectURL(file); }); }
+function bindScrub(video,range,tc){
+  range.addEventListener("input",()=>{ if(video.duration) video.currentTime=video.duration*range.value/1000; });
+  video.addEventListener("timeupdate",()=>{ tc.textContent=fmt(video.currentTime)+" / "+fmt(video.duration); });
+  video.addEventListener("loadedmetadata",()=>{ tc.textContent=fmt(0)+" / "+fmt(video.duration); });
+}
+
+/* ===== 업로드 ===== */
+let items=[]; let uploading=false;
+$("btnUpload").onclick=()=>{ $("dUp").showModal(); };
+fillCat($("bulkCat"),"","카테고리"); fillStyle($("bulkStyle"),"","","세부 유형");
+$("bulkCat").onchange=()=>fillStyle($("bulkStyle"),$("bulkCat").value,"","세부 유형");
+$("bulkApply").onclick=()=>{ const c=$("bulkCat").value, s=$("bulkStyle").value; items.forEach(it=>{ if(it.state!=="idle"&&it.state!=="fail") return; if(c&&!it.cat){ it.cat=c; fillCat(it.el.querySelector(".scat"),c,"카테고리 선택"); fillStyle(it.el.querySelector(".sstyle"),c,s||"",""); it.style=s||""; it.el.querySelectorAll(".missing").forEach(n=>{ if(n.value) n.classList.remove("missing"); }); } }); validate(); };
+const drop=$("drop");
+["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault(); drop.classList.add("over");}));
+["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault(); drop.classList.remove("over");}));
+drop.addEventListener("drop",e=>addFiles(e.dataTransfer.files));
+$("fileIn").onchange=e=>{ addFiles(e.target.files); e.target.value=""; };
+
+function addFiles(list){
+  [...list].filter(f=>/^video\//.test(f.type)||/\.(mp4|mov|m4v|webm)$/i.test(f.name)).forEach(file=>{
+    const it={file, cat:"", style:"", thumb:null, state:"idle", url:URL.createObjectURL(file)};
+    const el=document.createElement("div"); el.className="uitem"; it.el=el;
+    el.innerHTML=`<div class="uvid"><video muted playsinline preload="auto" src="${it.url}"></video><input type="range" class="scrub" min="0" max="1000" value="0"><div class="urow"><span class="tc">0:00</span><button class="btn sm cap">이 장면을 썸네일로</button></div></div>
+      <div class="umeta"><div class="uname">${esc(file.name)}</div><div class="usel"><select class="scat"></select><select class="sstyle"></select></div>
+      <div class="uthumb"><img alt=""><span class="tmsg">썸네일 미지정 · 위 막대로 장면을 고른 뒤 지정</span></div>
+      <div class="uprog"><div class="pbar"><i></i></div><span class="ust">대기</span></div></div>
+      <button class="x rm" aria-label="목록에서 빼기">×</button>`;
+    const v=el.querySelector("video");
+    bindScrub(v,el.querySelector(".scrub"),el.querySelector(".tc"));
+    fillCat(el.querySelector(".scat"),"","카테고리 선택"); fillStyle(el.querySelector(".sstyle"),"","","세부 유형 선택");
+    el.querySelector(".scat").onchange=e=>{ e.target.classList.remove("missing"); it.cat=e.target.value; it.style=""; fillStyle(el.querySelector(".sstyle"),it.cat,"",""); validate(); };
+    el.querySelector(".sstyle").onchange=e=>{ e.target.classList.remove("missing"); it.style=e.target.value; validate(); };
+    el.querySelector(".cap").onclick=()=>{
+      if(!v.videoWidth){ toast("영상을 불러오는 중입니다"); return; }
+      it.thumb=capture(v); el.querySelector(".uthumb img").src=it.thumb;
+      el.querySelector(".tmsg").innerHTML=`<span class="ok">썸네일 지정됨</span> (${fmt(v.currentTime)})`;
+      const next=items.find(x=>x!==it&&!x.thumb&&x.state==="idle");
+      items.forEach(x=>x.el.classList.remove("focus"));
+      if(next){ next.el.classList.add("focus"); next.el.scrollIntoView({behavior:"smooth",block:"center"}); next.el.querySelector(".scrub").focus({preventScroll:true}); }
+    };
+    el.querySelector(".rm").onclick=()=>{ if(it.state==="uploading") return; URL.revokeObjectURL(it.url); el.remove(); items=items.filter(x=>x!==it); validate(); };
+    $("ulist").appendChild(el); items.push(it);
+  });
+  validate();
+}
+function validate(){
+  const pending=items.filter(it=>it.state==="idle"||it.state==="fail");
+  $("bulk").hidden=!items.length;
+  const noThumb=pending.filter(it=>!it.thumb).length;
+  $("upNote").textContent=pending.length?`${pending.length}개 대기`+(noThumb?` · 썸네일 미지정 ${noThumb}개(드라이브 자동 썸네일 사용)`:""):(items.length?"완료":"");
+  $("btnStart").disabled=uploading||!pending.length;
+}
+function putFile(url,file,onp){ return new Promise((res,rej)=>{ const x=new XMLHttpRequest(); x.open("PUT",url); x.upload.onprogress=e=>{ if(e.lengthComputable) onp(e.loaded/e.total); }; x.onload=()=>{ if(x.status>=200&&x.status<300){ try{ res(JSON.parse(x.responseText)); }catch(e){ rej(new Error("응답 해석 실패")); } } else rej(new Error("업로드 실패 ("+x.status+")")); }; x.onerror=()=>rej(new Error("네트워크 오류")); x.send(file); }); }
+$("btnStart").onclick=async()=>{
+  const pending=items.filter(it=>it.state==="idle"||it.state==="fail");
+  let bad=false;
+  pending.forEach(it=>{ const sc=it.el.querySelector(".scat"), ss=it.el.querySelector(".sstyle"); sc.classList.toggle("missing",!it.cat); ss.classList.toggle("missing",!it.style); if(!it.cat||!it.style) bad=true; });
+  if(bad){ toast("카테고리와 세부 유형을 모두 지정하세요"); return; }
+  uploading=true; validate(); let ok=0;
+  for(const it of pending){
+    const bar=it.el.querySelector(".pbar i"), st=it.el.querySelector(".ust");
+    it.state="uploading"; it.el.classList.remove("fail"); st.textContent="준비 중…"; it.el.querySelectorAll("select,.cap,.scrub").forEach(n=>n.disabled=true);
+    try{
+      const s=await api({action:"init", folder:folderName(it.cat,it.style), name:it.file.name, size:it.file.size, mime:it.file.type||"video/mp4", origin:location.origin});
+      const res=await putFile(s.uploadUrl,it.file,p=>{ bar.style.width=(p*100).toFixed(1)+"%"; st.textContent=Math.round(p*100)+"%"; });
+      st.textContent="마무리 중…";
+      await api({action:"done", fileId:res.id, thumb:it.thumb||null});
+      it.state="done"; it.el.classList.add("done"); bar.style.width="100%"; st.textContent="완료"; ok++;
+    }catch(err){ it.state="fail"; it.el.classList.add("fail"); st.textContent="실패: "+err.message; it.el.querySelectorAll("select,.cap,.scrub").forEach(n=>n.disabled=false); }
+  }
+  uploading=false; validate();
+  if(ok){ toast(ok+"개 업로드 완료"); await reload(); }
+};
+
+/* ===== 썸네일 변경 ===== */
+let tTarget=null, tData=null;
+function openThumb(id){
+  const r=findFile(id); if(!r) return; tTarget=id; tData=null;
+  $("thumbTitle").textContent="썸네일 변경 · "+r.file.title; $("tvid").classList.add("hidden"); $("tPrev").removeAttribute("src"); $("tMsg").textContent="아직 지정 안 됨"; $("tSave").disabled=true;
+  $("dThumb").showModal();
+}
+bindScrub($("tVideo"),$("tScrub"),$("tTc"));
+$("tIn").onchange=async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f) return;
+  if(/^image\//.test(f.type)){ $("tvid").classList.add("hidden"); tData=await imageToJpeg(f); $("tPrev").src=tData; $("tMsg").innerHTML='<span class="ok">이미지로 지정됨</span>'; $("tSave").disabled=false; }
+  else { const v=$("tVideo"); if(v.src) URL.revokeObjectURL(v.src); v.src=URL.createObjectURL(f); $("tScrub").value=0; $("tvid").classList.remove("hidden"); }
+};
+$("tCap").onclick=()=>{ const v=$("tVideo"); if(!v.videoWidth){ toast("영상을 불러오는 중입니다"); return; } tData=capture(v); $("tPrev").src=tData; $("tMsg").innerHTML=`<span class="ok">장면 지정됨</span> (${fmt(v.currentTime)})`; $("tSave").disabled=false; };
+$("tSave").onclick=async()=>{
+  if(!tData||!tTarget) return; $("tSave").disabled=true; $("tMsg").textContent="저장 중…";
+  try{ const j=await api({action:"thumb", fileId:tTarget, thumb:tData}); const r=findFile(tTarget); if(r) r.file.thumb=j.thumb; render(); $("dThumb").close(); toast("썸네일 저장됨"); reload(); }
+  catch(err){ $("tMsg").textContent="실패: "+err.message; $("tSave").disabled=false; }
+};
+
+/* ===== 카테고리 이동 ===== */
+let mTarget=null;
+function openMove(id){
+  const r=findFile(id); if(!r) return; mTarget=id; const p=parseFolder(r.folder.name);
+  $("moveTitle").textContent="카테고리 이동 · "+r.file.title;
+  fillCat($("mCat"),p?p.cat.key:"",""); fillStyle($("mStyle"),p?p.cat.key:"",p?p.style:"","");
+  $("dMove").showModal();
+}
+$("mCat").onchange=()=>fillStyle($("mStyle"),$("mCat").value,"","");
+$("mSave").onclick=async()=>{
+  const c=$("mCat").value, s=$("mStyle").value; if(!c||!s){ toast("세부 유형을 선택하세요"); return; }
+  $("mSave").disabled=true;
+  try{
+    const target=folderName(c,s); await api({action:"move", fileId:mTarget, folder:target});
+    const r=findFile(mTarget); if(r){ r.folder.files=r.folder.files.filter(x=>x.id!==mTarget); let tf=folders.find(f=>f.name===target); if(!tf){ tf={name:target,files:[]}; folders.push(tf); } tf.files.push(r.file); }
+    render(); $("dMove").close(); toast("이동 완료"); reload();
+  }catch(err){ toast("이동 실패: "+err.message); }
+  finally{ $("mSave").disabled=false; }
+};
+
+/* ===== 삭제 ===== */
+let dTarget=null;
+function openDel(id){ const r=findFile(id); if(!r) return; dTarget=id; $("delMsg").innerHTML=`<b>${esc(r.file.title)}</b><br><span style="color:var(--muted)">구글 드라이브 휴지통으로 옮깁니다. (30일 안에 드라이브에서 복구 가능)</span>`; $("dDel").showModal(); }
+$("delOk").onclick=async()=>{
+  $("delOk").disabled=true;
+  try{ await api({action:"trash", fileId:dTarget}); const r=findFile(dTarget); if(r) r.folder.files=r.folder.files.filter(x=>x.id!==dTarget); render(); $("dDel").close(); toast("삭제됨"); reload(); }
+  catch(err){ toast("삭제 실패: "+err.message); }
+  finally{ $("delOk").disabled=false; }
+};
+
+/* ===== 시작 ===== */
+load().then(()=>{ if(adminKey&&API_URL) setAdmin(true); });
+</script>
+</body>
+</html>
